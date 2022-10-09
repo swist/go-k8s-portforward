@@ -68,19 +68,19 @@ func NewPortForwarder(namespace string, labels metav1.LabelSelector, port int) (
 }
 
 // Start a port forward to a pod - blocks until the tunnel is ready for use.
-func (p *PortForward) Start(ctx context.Context) error {
+func (p *PortForward) Start(ctx context.Context) (listenPort int, err error) {
 	p.stopChan = make(chan struct{}, 1)
 	readyChan := make(chan struct{}, 1)
 	errChan := make(chan error, 1)
 
-	listenPort, err := p.getListenPort()
+	listenPort, err = p.getListenPort()
 	if err != nil {
-		return errors.Wrap(err, "Could not find a port to bind to")
+		return -1, errors.Wrap(err, "Could not find a port to bind to")
 	}
 
 	dialer, err := p.dialer(ctx)
 	if err != nil {
-		return errors.Wrap(err, "Could not create a dialer")
+		return -1, errors.Wrap(err, "Could not create a dialer")
 	}
 
 	ports := []string{
@@ -90,7 +90,7 @@ func (p *PortForward) Start(ctx context.Context) error {
 	discard := ioutil.Discard
 	pf, err := portforward.New(dialer, ports, p.stopChan, readyChan, discard, discard)
 	if err != nil {
-		return errors.Wrap(err, "Could not port forward into pod")
+		return -1, errors.Wrap(err, "Could not port forward into pod")
 	}
 
 	go func() {
@@ -99,12 +99,12 @@ func (p *PortForward) Start(ctx context.Context) error {
 
 	select {
 	case err = <-errChan:
-		return errors.Wrap(err, "Could not create port forward")
+		return -1, errors.Wrap(err, "Could not create port forward")
 	case <-readyChan:
-		return nil
+		return
 	}
 
-	return nil
+	return
 }
 
 // Stop a port forward.
