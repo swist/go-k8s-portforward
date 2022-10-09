@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -53,7 +54,7 @@ func main() {
 	pf.Name = pod
 	pf.ListenPort = listenPort
 
-	err = pf.Start()
+	err = pf.Start(context.Background())
 	if err != nil {
 		log.Fatal("Error starting port forward: ", err)
 	}
