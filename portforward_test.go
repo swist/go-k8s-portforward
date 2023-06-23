@@ -59,7 +59,7 @@ func TestFindPodByLabelsNoneExist(t *testing.T) {
 
 	_, err := pf.findPodByLabels(context.Background())
 	assert.NotNil(t, err)
-	assert.Equal(t, "Could not find pod for selector: labels \"name=flux\"", err.Error())
+	assert.Equal(t, "Could not find running pod for selector: labels \"name=flux\"", err.Error())
 }
 
 func TestFindPodByLabelsMultiple(t *testing.T) {
@@ -133,7 +133,7 @@ func TestFindPodByLabelsExpressionNotFound(t *testing.T) {
 
 	_, err := pf.findPodByLabels(context.Background())
 	assert.NotNil(t, err)
-	assert.Equal(t, "Could not find pod for selector: labels \"name in (flux,fluxd)\"", err.Error())
+	assert.Equal(t, "Could not find running pod for selector: labels \"name in (flux,fluxd)\"", err.Error())
 }
 
 func TestGetPodNameNameSet(t *testing.T) {
