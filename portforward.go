@@ -17,7 +17,6 @@ import (
 	"k8s.io/client-go/transport/spdy"
 	"net"
 	"net/http"
-	"os"
 )
 
 // Used for creating a port forward into a Kubernetes pod
@@ -97,8 +96,6 @@ func (p *PortForward) Start(ctx context.Context) (listenPort int, err error) {
 	go func() {
 		errChan <- pf.ForwardPorts()
 	}()
-
-	sigs := make(chan os.Signal, 1)
 
 	select {
 	case err = <-errChan:
